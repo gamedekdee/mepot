@@ -1,0 +1,37 @@
+{
+  "admin01": {
+    "password": "$2b$12$Y0N12bId19m.RuaqEJaW9uedmWBnsgoXDnV/eq0mgmC3Phn9UWkF2",
+    "points": 10000,
+    "history": [],
+    "role": "admin"
+  },
+  "member1": {
+    "password": "$2b$10$abcdefghij1234567890DUMMYP@ssw0rDhashxxxxxxx",
+    "points": 464,
+    "history": [],
+    "role": "user"
+  },
+  "luvme": {
+    "password": "$2b$10$CinBl8Zm6W8aCFiUTH02gefDINk2ChLQCvN0dhNnEah4750kqxFKu",
+    "points": 9729,
+    "history": [
+      {
+        "code": "แตงโมบับ",
+        "date": "2025-07-30T03:20:14.908Z"
+      },
+      {
+        "code": "แตงโมบับ",
+        "date": "2025-07-30T03:31:10.839Z"
+      },
+      {
+        "code": "pinkberry",
+        "date": "2025-07-30T03:31:15.880Z"
+      },
+      {
+        "code": "แตงโมบับ",
+        "date": "2025-07-30T03:33:35.674Z"
+      }
+    ],
+    "role": "user"
+  }
+}

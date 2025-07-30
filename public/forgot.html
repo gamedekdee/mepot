@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ลืมรหัสผ่าน</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Prompt', sans-serif;
+      background: linear-gradient(135deg, #000000, #292929);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .box {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(12px);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 360px;
+      color: white;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.4);
+      color: #333;
+    }
+
+    button {
+      padding: 12px;
+      width: 100%;
+      border-radius: 12px;
+      border: none;
+      background: #fff;
+      color: #000000;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <form class="box" onsubmit="reset(event)">
+    <h2>ลืมรหัสผ่าน</h2>
+    <input id="username" placeholder="เบอร์โทร" required />
+    <input id="newpass" type="password" placeholder="รหัสผ่านใหม่" required />
+    <button type="submit">ตั้งรหัสผ่านใหม่</button>
+  </form>
+
+  <script>
+    async function reset(e) {
+      e.preventDefault();
+      const res = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('username').value,
+          newPassword: document.getElementById('newpass').value
+        })
+      });
+
+      const data = await res.json();
+      alert(data.msg);
+      if (res.ok) location.href = '/';
+    }
+  </script>
+</body>
+</html>
