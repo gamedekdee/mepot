@@ -2,7 +2,7 @@
   "แตงโมบับ": {
     "points": 12000,
     "image": "water.png",
-    "quantity": 4
+    "quantity": 1
   },
   "pinkberry": {
     "points": 12000,
@@ -54,7 +54,7 @@
     "image": "Peach1.png",
     "quantity": 0
   },
-  "Rainbow-Candy": {
+  "RainbowCandy": {
     "points": 12000,
     "image": "Rainbow-Candy.png",
     "quantity": 65
@@ -77,6 +77,16 @@
   "Watermelon": {
     "points": 12000,
     "image": "Watermelon.png",
+    "quantity": 65
+  },
+  "Mentholfreeze": {
+    "points": 12000,
+    "image": "menthol-freeze.png",
+    "quantity": 65
+  },
+  "Strawberry Milkshake": {
+    "points": 12000,
+    "image": "Strawberry Milkshake.png",
     "quantity": 65
   }
 }

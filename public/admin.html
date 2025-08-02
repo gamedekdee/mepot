@@ -1,179 +1,203 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel</title>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
+  <title>Admin Panel (Cards)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet" />
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Prompt', sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: start;
-      padding: 40px 16px;
+      background: #f0f2f5;
+      color: #333;
     }
-
     .container {
-      width: 100%;
-      max-width: 500px;
-      background: rgba(255, 255, 255, 0.15);
-      padding: 24px;
-      border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-      backdrop-filter: blur(10px);
-      color: #fff;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 16px;
     }
-
     h2 {
-      margin-top: 0;
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       margin-bottom: 16px;
     }
-
-    label {
-      display: block;
-      margin: 12px 0 6px;
-      font-weight: bold;
+    .section {
+      margin-bottom: 32px;
     }
-
-    select, input {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: none;
-      margin-bottom: 12px;
+    /* Add Points Section */
+    .add-points {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+    .add-points select,
+    .add-points input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
       font-size: 1rem;
-      background: rgba(255,255,255,0.2);
+    }
+    .add-points button {
+      padding: 10px 16px;
+      background: #007bff;
       color: #fff;
-    }
-
-    input::placeholder {
-      color: #eee;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      font-weight: bold;
-      background-color: #ffffff;
-      color: #764ba2;
       border: none;
-      border-radius: 12px;
+      border-radius: 6px;
       cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .add-points button:hover {
+      background: #0056b3;
+    }
+    .current-points {
       margin-top: 8px;
-      box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+      font-weight: 600;
     }
-
-    button:hover {
-      background-color: #eee;
+    /* Reward Cards Section */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+      gap: 20px;
     }
-
-    hr {
-      margin: 32px 0;
+    .reward-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .reward-card img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .reward-card h3 {
+      margin: 8px 0;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+    .reward-card .qty {
+      margin: 4px 0;
+      font-size: 0.95rem;
+      color: #555;
+    }
+    .reward-card input {
+      width: 80px;
+      padding: 6px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .reward-card button {
+      margin-top: auto;
+      padding: 8px 12px;
+      background: #28a745;
+      color: #fff;
       border: none;
-      height: 1px;
-      background: rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
     }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 20px;
+    .reward-card button:hover {
+      background: #218838;
+    }
+    @media (max-width: 600px) {
+      .add-points {
+        grid-template-columns: 1fr;
       }
-
-      h2 {
-        font-size: 1.2rem;
+      .add-points button {
+        width: 100%;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>🧑‍💼 เพิ่มแต้มให้ผู้ใช้</h2>
-    <label for="user">เลือกผู้ใช้:</label>
-    <select id="user" onchange="showUserPoints()"></select>
-    <p id="user-points">แต้ม: -</p>
-    <input id="points" type="number" placeholder="แต้มที่ต้องการเพิ่ม" />
-    <button onclick="addPoints()">เพิ่มแต้ม</button>
+    <div class="section">
+      <h2>🧑‍💼 เพิ่มแต้มให้ผู้ใช้</h2>
+      <div class="add-points">
+        <select id="user-select"></select>
+        <input id="points-input" type="number" placeholder="จำนวนแต้ม" />
+        <button onclick="addPoints()">เพิ่มแต้ม</button>
+      </div>
+      <div class="current-points" id="current-points">แต้มปัจจุบัน: -</div>
+    </div>
 
-    <hr />
-
-    <h2>🎁 แก้ไขจำนวนของรางวัลที่เหลือ</h2>
-    <label for="reward-select">เลือกของรางวัล:</label>
-    <select id="reward-select"></select>
-    <input id="quantity" type="number" placeholder="จำนวนที่เหลือใหม่" />
-    <button onclick="updateQuantity()">อัปเดตจำนวน</button>
+    <div class="section">
+      <h2>🎁 แก้ไขจำนวนของรางวัล</h2>
+      <div class="card-grid" id="rewards-grid"></div>
+    </div>
   </div>
 
   <script>
-    let allUsers = {};
+    let users = {};
+    let rewards = {};
 
     async function loadUsers() {
       const res = await fetch('/api/all-users');
-      const data = await res.json();
-      allUsers = data;
-
-      const select = document.getElementById('user');
-      select.innerHTML = Object.keys(data).map(username =>
-        `<option value="${username}">${username}</option>`
-      ).join('');
-      showUserPoints();
+      users = await res.json();
+      const sel = document.getElementById('user-select');
+      sel.innerHTML = Object.keys(users)
+        .map(u => `<option value="${u}">${u}</option>`)
+        .join('');
+      sel.onchange = updateCurrentPoints;
+      updateCurrentPoints();
     }
 
-    function showUserPoints() {
-      const selected = document.getElementById('user').value;
-      const points = allUsers[selected]?.points ?? '-';
-      document.getElementById('user-points').innerText = `แต้ม: ${points}`;
-    }
-
-    async function loadRewards() {
-      const res = await fetch('/api/rewards');
-      const data = await res.json();
-      const select = document.getElementById('reward-select');
-      select.innerHTML = Object.keys(data).map(r =>
-        `<option value="${r}">${r}</option>`
-      ).join('');
+    function updateCurrentPoints() {
+      const u = document.getElementById('user-select').value;
+      document.getElementById('current-points').innerText =
+        'แต้มปัจจุบัน: ' + (users[u]?.points || 0);
     }
 
     async function addPoints() {
-      const username = document.getElementById('user').value;
-      const points = parseInt(document.getElementById('points').value);
+      const username = document.getElementById('user-select').value;
+      const points = parseInt(document.getElementById('points-input').value);
       const token = localStorage.getItem('token');
-
       const res = await fetch('/api/admin/add-points', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify({ username, points })
+        method:'POST',
+        headers:{ 'Content-Type':'application/json','Authorization':'Bearer '+token },
+        body:JSON.stringify({ username, points })
       });
-
       const data = await res.json();
       alert(data.msg);
       loadUsers();
     }
 
-    async function updateQuantity() {
-      const rewardName = document.getElementById('reward-select').value;
-      const quantity = parseInt(document.getElementById('quantity').value);
+    async function loadRewards() {
+      const res = await fetch('/api/rewards');
+      rewards = await res.json();
+      const grid = document.getElementById('rewards-grid');
+      grid.innerHTML = Object.entries(rewards).map(([name, r]) => `
+        <div class="reward-card">
+          <img src="images/${r.image}" alt="${name}" />
+          <h3>${name}</h3>
+          <div class="qty">เหลือ: ${r.quantity} ชิ้น</div>
+          <input id="qty-${name}" type="number" placeholder="จำนวนใหม่" min="0" />
+          <button onclick="updateQty('${name}')">อัปเดต</button>
+        </div>
+      `).join('');
+    }
+
+    async function updateQty(name) {
+      const qty = parseInt(document.getElementById('qty-'+name).value);
       const token = localStorage.getItem('token');
-
       const res = await fetch('/api/update-quantity', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify({ rewardName, quantity })
+        method:'POST',
+        headers:{ 'Content-Type':'application/json','Authorization':'Bearer '+token },
+        body:JSON.stringify({ rewardName:name, quantity:qty })
       });
-
       const data = await res.json();
       alert(data.msg);
+      loadRewards();
     }
 
     loadUsers();
