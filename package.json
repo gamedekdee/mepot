@@ -2,7 +2,7 @@
   "name": "product-loyalty-app",
   "version": "1.0.0",
   "scripts": {
-    "start": "node src/server.js/node server.js"
+    "start": "node src/server.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
