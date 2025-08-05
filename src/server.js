@@ -1,180 +1,226 @@
-const express = require('express');
-const fs = require('fs');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const app = express();
+// server.js
+require('dotenv').config();            // โหลดค่าใน .env
+const express     = require('express');
+const mongoose    = require('mongoose');
+const jwt         = require('jsonwebtoken');
+const bcrypt      = require('bcrypt');
+const bodyParser  = require('body-parser');
+const cors        = require('cors');
 
+const app         = express();
+const PORT        = process.env.PORT || 3000;
+const SECRET_KEY  = process.env.SECRET_KEY || 'my-secret-key';
+
+// ─── เชื่อมต่อ MongoDB ───────────────────────────────────────────────────────
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('✅ MongoDB connected!'))
+  .catch(err => console.error('❌ Connection error:', err));
+
+// ─── มิดเดิลแวร์ ───────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static('public'));  // เสิร์ฟไฟล์ในโฟลเดอร์ public
 
-const SECRET = 'my-secret-key';
+// ─── สร้าง Schemas & Models ──────────────────────────────────────────────────
+const HistorySchema = new mongoose.Schema({
+  code:  String,
+  date:  { type: Date, default: Date.now }
+}, { _id: false });
 
-let users = JSON.parse(fs.readFileSync('./data/users.json', 'utf-8'));
-let codes = JSON.parse(fs.readFileSync('./data/codes.json', 'utf-8'));
-let rewards = JSON.parse(fs.readFileSync('./data/rewards.json', 'utf-8'));
+const UserSchema = new mongoose.Schema({
+  username: { type: String, unique: true, required: true },
+  password: { type: String, required: true },
+  points:   { type: Number, default: 0 },
+  history:  [HistorySchema],
+  role:     { type: String, enum: ['user','admin'], default: 'user' }
+});
+const CodeSchema = new mongoose.Schema({
+  code:   { type: String, unique: true, required: true },
+  points: { type: Number, required: true }
+});
+const RewardSchema = new mongoose.Schema({
+  name:     { type: String, unique: true, required: true },
+  points:   { type: Number, required: true },
+  quantity: { type: Number, required: true }
+});
 
-// สมัคร
+const User   = mongoose.model('User', UserSchema);
+const Code   = mongoose.model('Code', CodeSchema);
+const Reward = mongoose.model('Reward', RewardSchema);
+
+// ─── ฟังก์ชันช่วยตรวจ JWT ─────────────────────────────────────────────────
+function authorize(req, res, next) {
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ msg: 'Missing token' });
+  try {
+    req.user = jwt.verify(token, SECRET_KEY);
+    next();
+  } catch {
+    res.status(403).json({ msg: 'Invalid or expired token' });
+  }
+}
+
+// ─── ROUTES ────────────────────────────────────────────────────────────────────
+
+// 1) สมัครสมาชิก
 app.post('/api/register', async (req, res) => {
-  const { username, password } = req.body;
-  if (users[username]) return res.status(400).json({ msg: 'มีผู้ใช้นี้แล้ว' });
+  try {
+    const { username, password } = req.body;
+    if (!username || !password)
+      return res.status(400).json({ msg: 'Username and password required' });
 
-  const hashed = await bcrypt.hash(password, 10);
-  users[username] = { password: hashed, points: 0, history: [], role: "user" };
+    if (await User.exists({ username }))
+      return res.status(400).json({ msg: 'User already exists' });
 
-  fs.writeFileSync('./data/users.json', JSON.stringify(users, null, 2));
-  res.json({ msg: 'สมัครเรียบร้อย' });
+    const hash = await bcrypt.hash(password, 10);
+    await User.create({ username, password: hash });
+    res.json({ msg: 'Registration successful' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
+  }
 });
 
-// ล็อกอิน
+// 2) เข้าสู่ระบบ
 app.post('/api/login', async (req, res) => {
-  const { username, password } = req.body;
-  const user = users[username];
-  if (!user || !(await bcrypt.compare(password, user.password)))
-    return res.status(401).json({ msg: 'ชื่อผู้ใช้หรือรหัสผ่านผิด' });
-
-  const token = jwt.sign({ username }, SECRET, { expiresIn: '2h' });
-  res.json({ token });
-});
-
-// เช็ครหัสสินค้า
-app.post('/api/check-code', (req, res) => {
-  const auth = req.headers.authorization;
-  const token = auth && auth.split(' ')[1];
-  if (!token) return res.status(401).json({ msg: 'no token' });
-
   try {
-    const decoded = jwt.verify(token, SECRET);
-    const reward = codes[req.body.code];
-    if (!reward) return res.status(404).json({ msg: 'โค้ดไม่ถูกต้อง' });
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    if (!user || !(await bcrypt.compare(password, user.password)))
+      return res.status(401).json({ msg: 'Invalid credentials' });
 
-    const user = users[decoded.username];
-    user.points += reward.points;
-    user.history.push({ code: req.body.code, date: new Date().toISOString() });
-    fs.writeFileSync('./data/users.json', JSON.stringify(users, null, 2));
-    res.json({ msg: 'สำเร็จ', reward, points: user.points });
-  } catch {
-    res.status(403).json({ msg: 'token ไม่ถูกต้อง' });
+    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '2h' });
+    res.json({ token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// me
-app.get('/api/me', (req, res) => {
-  const auth = req.headers.authorization;
-  const token = auth && auth.split(' ')[1];
-  if (!token) return res.status(401).json({ msg: 'no token' });
+// 3) ดูข้อมูลผู้ใช้ (Profile)
+app.get('/api/me', authorize, async (req, res) => {
+  const user = await User.findOne({ username: req.user.username })
+    .select('-password -__v');
+  if (!user) return res.status(404).json({ msg: 'User not found' });
+  res.json(user);
+});
 
+// 4) เช็คโค้ดแลกแต้ม (เพิ่มแต้ม)
+app.post('/api/check-code', authorize, async (req, res) => {
   try {
-    const decoded = jwt.verify(token, SECRET);
-    const user = users[decoded.username];
-    res.json({ username: decoded.username, points: user.points, history: user.history, role: user.role });
-  } catch {
-    res.status(403).json({ msg: 'token ไม่ถูกต้อง' });
+    const { code } = req.body;
+    const found = await Code.findOne({ code });
+    if (!found) return res.status(404).json({ msg: 'Invalid code' });
+
+    const user = await User.findOne({ username: req.user.username });
+    user.points += found.points;
+    user.history.push({ code, date: new Date() });
+    await user.save();
+    res.json({ msg: 'Success', reward: found.points, points: user.points });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// รายการของรางวัล
-app.get('/api/rewards', (req, res) => {
-  res.json(rewards);
+// 5) ดูรางวัลทั้งหมด
+app.get('/api/rewards', async (req, res) => {
+  const list = await Reward.find().select('-__v');
+  res.json(list);
 });
 
-// แอดมินเพิ่มแต้มให้ผู้ใช้
-app.post('/api/admin/add-points', (req, res) => {
-  const auth = req.headers.authorization;
-  const token = auth && auth.split(' ')[1];
-  if (!token) return res.status(401).json({ msg: 'no token' });
-
+// 6) เพิ่มแต้มให้ผู้ใช้ (Admin)
+app.post('/api/admin/add-points', authorize, async (req, res) => {
   try {
-    const decoded = jwt.verify(token, SECRET);
-    const currentUser = users[decoded.username];
-    if (currentUser.role !== 'admin') return res.status(403).json({ msg: 'คุณไม่ใช่แอดมิน' });
+    const admin = await User.findOne({ username: req.user.username });
+    if (admin.role !== 'admin')
+      return res.status(403).json({ msg: 'Forbidden' });
 
     const { username, points } = req.body;
-    if (!users[username]) return res.status(404).json({ msg: 'ไม่พบผู้ใช้' });
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ msg: 'User not found' });
 
-    users[username].points += points;
-    fs.writeFileSync('./data/users.json', JSON.stringify(users, null, 2));
-    res.json({ msg: `เพิ่มแต้มให้ ${username} เรียบร้อยแล้ว` });
-  } catch {
-    res.status(403).json({ msg: 'token ไม่ถูกต้อง' });
+    user.points += Number(points);
+    await user.save();
+    res.json({ msg: `Added ${points} points to ${username}` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// แลกของรางวัล
-app.post('/api/redeem', (req, res) => {
-  const auth = req.headers.authorization;
-  const token = auth && auth.split(' ')[1];
-  if (!token) return res.status(401).json({ msg: 'ไม่พบ token' });
-
+// 7) แลกรางวัล
+app.post('/api/redeem', authorize, async (req, res) => {
   try {
-    const decoded = jwt.verify(token, SECRET);
-    const user = users[decoded.username];
-    const { rewardName } = req.body;
+    const { name } = req.body;
+    const reward = await Reward.findOne({ name });
+    if (!reward) return res.status(404).json({ msg: 'Reward not found' });
 
-    const reward = rewards[rewardName];
-    if (!reward) return res.status(404).json({ msg: 'ไม่พบของรางวัล' });
-
-    if (reward.quantity <= 0) {
-      return res.status(400).json({ msg: 'ของรางวัลหมดแล้ว' });
-    }
-
-    if (user.points < reward.points) {
-      return res.status(400).json({ msg: 'แต้มไม่เพียงพอ' });
-    }
+    const user = await User.findOne({ username: req.user.username });
+    if (user.points < reward.points)
+      return res.status(400).json({ msg: 'Insufficient points' });
+    if (reward.quantity <= 0)
+      return res.status(400).json({ msg: 'Out of stock' });
 
     user.points -= reward.points;
     reward.quantity -= 1;
-    user.history = user.history || [];
-    user.history.push({
-      code: rewardName,
-      date: new Date().toISOString()
-    });
-
-    fs.writeFileSync('./data/users.json', JSON.stringify(users, null, 2));
-    fs.writeFileSync('./data/rewards.json', JSON.stringify(rewards, null, 2));
-
-    res.json({ msg: 'แลกของรางวัลสำเร็จ!' });
-  } catch {
-    res.status(403).json({ msg: 'token ไม่ถูกต้อง' });
+    user.history.push({ code: name, date: new Date() });
+    await Promise.all([ user.save(), reward.save() ]);
+    res.json({ msg: 'Redeemed successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// อัปเดตจำนวนของรางวัล (admin)
-app.post('/api/update-quantity', (req, res) => {
-  const { rewardName, quantity } = req.body;
+// 8) อัพเดตจำนวนสินค้า (Admin)
+app.post('/api/update-quantity', authorize, async (req, res) => {
+  try {
+    const admin = await User.findOne({ username: req.user.username });
+    if (admin.role !== 'admin')
+      return res.status(403).json({ msg: 'Forbidden' });
 
-  if (!rewards[rewardName]) {
-    return res.status(404).json({ msg: 'ไม่พบของรางวัล' });
+    const { name, quantity } = req.body;
+    const reward = await Reward.findOne({ name });
+    if (!reward) return res.status(404).json({ msg: 'Reward not found' });
+
+    reward.quantity = Number(quantity);
+    await reward.save();
+    res.json({ msg: 'Quantity updated' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
   }
-
-  rewards[rewardName].quantity = quantity;
-
-  fs.writeFileSync('./data/rewards.json', JSON.stringify(rewards, null, 2));
-  res.json({ msg: 'อัปเดตจำนวนสำเร็จ' });
 });
 
-app.listen(3000, () => console.log('🚀 Server running on http://localhost:3000'));
+// 9) ดูรายชื่อผู้ใช้ทั้งหมด (Admin)
+app.get('/api/all-users', authorize, async (req, res) => {
+  const admin = await User.findOne({ username: req.user.username });
+  if (admin.role !== 'admin')
+    return res.status(403).json({ msg: 'Forbidden' });
 
-// ส่งรายชื่อผู้ใช้ทั้งหมด (admin ใช้สร้าง dropdown)
-app.get('/api/all-users', (req, res) => {
-  res.json(users); // users เป็น object: { username: { ... }, ... }
+  const list = await User.find().select('username points role');
+  res.json(list);
 });
 
-app.get('/api/all-users', (req, res) => {
-  res.json(users);
-});
-
-// ลืมรหัสผ่าน (reset)
+// 10) รีเซ็ตรหัสผ่าน
 app.post('/api/reset-password', async (req, res) => {
-  const { username, newPassword } = req.body;
+  try {
+    const { username, newPassword } = req.body;
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ msg: 'User not found' });
 
-  if (!users[username]) return res.status(404).json({ msg: 'ไม่พบผู้ใช้นี้' });
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ msg: 'Password reset successful' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
 
-  const hashed = await bcrypt.hash(newPassword, 10);
-  users[username].password = hashed;
-
-  fs.writeFileSync('./data/users.json', JSON.stringify(users, null, 2));
-  res.json({ msg: 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว' });
+// ─── สตาร์ทเซิร์ฟเวอร์ ─────────────────────────────────────────────────────────
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
