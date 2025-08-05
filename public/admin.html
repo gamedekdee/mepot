@@ -1,126 +1,38 @@
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel (Cards)</title>
+  <title>Admin Panel</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Prompt', sans-serif;
-      background: #f0f2f5;
-      color: #333;
-    }
-    .container {
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 0 16px;
-    }
-    h2 {
-      font-size: 1.5rem;
-      margin-bottom: 16px;
-    }
-    .section {
-      margin-bottom: 32px;
-    }
-    /* Add Points Section */
-    .add-points {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 12px;
-      align-items: end;
-    }
-    .add-points select,
-    .add-points input {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-    .add-points button {
-      padding: 10px 16px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
-    .add-points button:hover {
-      background: #0056b3;
-    }
-    .current-points {
-      margin-top: 8px;
-      font-weight: 600;
-    }
-    /* Reward Cards Section */
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-      gap: 20px;
-    }
-    .reward-card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .reward-card img {
-      width: 100%;
-      border-radius: 8px;
-      margin-bottom: 12px;
-    }
-    .reward-card h3 {
-      margin: 8px 0;
-      font-size: 1.1rem;
-      text-align: center;
-    }
-    .reward-card .qty {
-      margin: 4px 0;
-      font-size: 0.95rem;
-      color: #555;
-    }
-    .reward-card input {
-      width: 80px;
-      padding: 6px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      text-align: center;
-    }
-    .reward-card button {
-      margin-top: auto;
-      padding: 8px 12px;
-      background: #28a745;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
-    .reward-card button:hover {
-      background: #218838;
-    }
-    @media (max-width: 600px) {
-      .add-points {
-        grid-template-columns: 1fr;
-      }
-      .add-points button {
-        width: 100%;
-      }
-    }
+    /* (ใส่ CSS ตาม admin.html เดิมได้เลย) */
+    *{box-sizing:border-box;} body{margin:0;font-family:'Prompt',sans-serif;background:#f0f2f5;color:#333;}
+    .container{max-width:900px;margin:40px auto;padding:0 16px;}
+    h2{font-size:1.5rem;margin-bottom:16px;}
+    .section{margin-bottom:32px;}
+    .add-points{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;}
+    .add-points select,.add-points input{padding:10px;border:1px solid #ccc;border-radius:6px;font-size:1rem;}
+    .add-points button{padding:10px 16px;background:#007bff;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;transition:background .2s;}
+    .add-points button:hover{background:#0056b3;}
+    .current-points{margin-top:8px;font-weight:600;}
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;}
+    .reward-card{background:#fff;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,.1);padding:16px;display:flex;flex-direction:column;align-items:center;}
+    .reward-card img{width:100%;border-radius:8px;margin-bottom:12px;}
+    .reward-card h3{margin:8px 0;font-size:1.1rem;text-align:center;}
+    .reward-card .qty{margin:4px 0;font-size:.95rem;color:#555;}
+    .reward-card input{width:80px;padding:6px;margin:8px 0;border:1px solid #ccc;border-radius:6px;text-align:center;}
+    .reward-card button{margin-top:auto;padding:8px 12px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;transition:background .2s;}
+    .reward-card button:hover{background:#218838;}
+    form.add-reward{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:16px;}
+    form.add-reward input, form.add-reward button{padding:10px;border:1px solid #ccc;border-radius:6px;font-size:1rem;}
+    form.add-reward button{background:#17a2b8;color:#fff;border:none;cursor:pointer;transition:background .2s;}
+    form.add-reward button:hover{background:#117a8b;}
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Add Points Section -->
     <div class="section">
       <h2>🧑‍💼 เพิ่มแต้มให้ผู้ใช้</h2>
       <div class="add-points">
@@ -131,75 +43,108 @@
       <div class="current-points" id="current-points">แต้มปัจจุบัน: -</div>
     </div>
 
+    <!-- Update Quantity Section -->
     <div class="section">
-      <h2>🎁 แก้ไขจำนวนของรางวัล</h2>
+      <h2>🎁 แก้ไขจำนวนรางวัลเดิม</h2>
       <div class="card-grid" id="rewards-grid"></div>
+    </div>
+
+    <!-- Add New Reward Section -->
+    <div class="section">
+      <h2>➕ เพิ่มรางวัลใหม่พร้อมภาพ</h2>
+      <form class="add-reward" id="form-add-reward" enctype="multipart/form-data">
+        <input name="name" type="text" placeholder="ชื่อรางวัล" required />
+        <input name="points" type="number" placeholder="แต้มที่ต้องใช้" required />
+        <input name="quantity" type="number" placeholder="จำนวนสินค้าคงเหลือ" required />
+        <input name="image" type="file" accept="image/*" required />
+        <button type="submit">อัปโหลดรางวัล</button>
+      </form>
+      <p id="add-reward-msg"></p>
     </div>
   </div>
 
   <script>
-    let users = {};
-    let rewards = {};
+    let users, rewards;
 
+    // Load users for Add Points
     async function loadUsers() {
-      const res = await fetch('/api/all-users');
+      const res = await fetch('/api/all-users', {
+        headers:{ 'Authorization':'Bearer '+localStorage.getItem('token') }
+      });
       users = await res.json();
       const sel = document.getElementById('user-select');
-      sel.innerHTML = Object.keys(users)
-        .map(u => `<option value="${u}">${u}</option>`)
-        .join('');
-      sel.onchange = updateCurrentPoints;
+      sel.innerHTML = users.map(u=>`<option value="${u.username}">${u.username}</option>`).join('');
       updateCurrentPoints();
+      sel.onchange = updateCurrentPoints;
     }
-
     function updateCurrentPoints() {
       const u = document.getElementById('user-select').value;
-      document.getElementById('current-points').innerText =
-        'แต้มปัจจุบัน: ' + (users[u]?.points || 0);
+      const found = users.find(x=>x.username===u);
+      document.getElementById('current-points').innerText = 'แต้มปัจจุบัน: ' + (found?.points||0);
     }
-
     async function addPoints() {
       const username = document.getElementById('user-select').value;
-      const points = parseInt(document.getElementById('points-input').value);
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/admin/add-points', {
+      const points   = parseInt(document.getElementById('points-input').value);
+      const res = await fetch('/api/admin/add-points',{
         method:'POST',
-        headers:{ 'Content-Type':'application/json','Authorization':'Bearer '+token },
-        body:JSON.stringify({ username, points })
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer '+localStorage.getItem('token')
+        },
+        body: JSON.stringify({ username, points })
       });
-      const data = await res.json();
-      alert(data.msg);
+      const j = await res.json();
+      alert(j.msg);
       loadUsers();
     }
 
+    // Load rewards for Update Quantity
     async function loadRewards() {
       const res = await fetch('/api/rewards');
       rewards = await res.json();
       const grid = document.getElementById('rewards-grid');
-      grid.innerHTML = Object.entries(rewards).map(([name, r]) => `
+      grid.innerHTML = rewards.map(r=>`
         <div class="reward-card">
-          <img src="images/${r.image}" alt="${name}" />
-          <h3>${name}</h3>
+          <img src="/images/${r.image}" alt="${r.name}" />
+          <h3>${r.name}</h3>
           <div class="qty">เหลือ: ${r.quantity} ชิ้น</div>
-          <input id="qty-${name}" type="number" placeholder="จำนวนใหม่" min="0" />
-          <button onclick="updateQty('${name}')">อัปเดต</button>
+          <input id="qty-${r.name}" type="number" placeholder="จำนวนใหม่" min="0" />
+          <button onclick="updateQty('${r.name}')">อัปเดต</button>
         </div>
       `).join('');
     }
-
     async function updateQty(name) {
-      const qty = parseInt(document.getElementById('qty-'+name).value);
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/update-quantity', {
+      const qty = parseInt(document.getElementById(`qty-${name}`).value);
+      const res = await fetch('/api/admin/update-quantity',{
         method:'POST',
-        headers:{ 'Content-Type':'application/json','Authorization':'Bearer '+token },
-        body:JSON.stringify({ rewardName:name, quantity:qty })
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer '+localStorage.getItem('token')
+        },
+        body: JSON.stringify({ name, quantity: qty })
       });
-      const data = await res.json();
-      alert(data.msg);
+      const j = await res.json();
+      alert(j.msg);
       loadRewards();
     }
 
+    // Add new reward with image upload
+    document.getElementById('form-add-reward').addEventListener('submit', async e=>{
+      e.preventDefault();
+      const form = e.target;
+      const data = new FormData(form);
+      const res = await fetch('/api/admin/add-reward', {
+        method: 'POST',
+        headers: { 'Authorization':'Bearer '+localStorage.getItem('token') },
+        body: data
+      });
+      const j = await res.json();
+      document.getElementById('add-reward-msg').innerText = j.msg;
+      form.reset();
+      loadRewards();
+    });
+
+    // Init
     loadUsers();
     loadRewards();
   </script>

@@ -3,78 +3,129 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ลืมรหัสผ่าน</title>
+  <title>ลืมรหัสผ่าน | ระบบสะสมแต้ม</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet" />
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
+      padding: 0;
       font-family: 'Prompt', sans-serif;
-      background: linear-gradient(135deg, #000000, #292929);
+      background: linear-gradient(135deg, #000000, #4e4e4e);
       height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
     }
-
-    .box {
-      background: rgba(255, 255, 255, 0.2);
+    .login-container {
+      background: rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 380px;
       backdrop-filter: blur(12px);
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      width: 100%;
-      max-width: 360px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
       color: white;
       text-align: center;
     }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 16px;
-      border-radius: 12px;
-      border: none;
-      font-size: 1rem;
-      background: rgba(255,255,255,0.4);
-      color: #333;
+    .login-container img {
+      width: 80px;
+      margin-bottom: 20px;
     }
-
-    button {
-      padding: 12px;
+    .login-container h2 {
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+    .login-container input {
       width: 100%;
+      padding: 12px 16px;
       border-radius: 12px;
       border: none;
-      background: #fff;
-      color: #000000;
-      font-weight: bold;
+      outline: none;
+      margin-bottom: 16px;
       font-size: 1rem;
+      background: rgba(255,255,255,0.3);
+      color: #fff;
+    }
+    .login-container input::placeholder {
+      color: #eee;
+    }
+    .login-container button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      background-color: #000000;
+      color: white;
       cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .login-container button:hover {
+      background-color: #000000;
+    }
+    .login-container .links {
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+    .login-container .links a {
+      color: #fff;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .login-container .links a:hover {
+      opacity: 0.8;
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: linear-gradient(135deg, #141e30, #243b55);
+      }
     }
   </style>
 </head>
 <body>
-  <form class="box" onsubmit="reset(event)">
-    <h2>ลืมรหัสผ่าน</h2>
-    <input id="username" placeholder="เบอร์โทร" required />
+  <form class="login-container" onsubmit="resetPassword(event)">
+    <img src="https://cdn-icons-png.flaticon.com/512/1828/1828506.png" alt="lock" />
+    <h2>รีเซ็ตรหัสผ่าน</h2>
+    <input id="user" placeholder="เบอร์โทร (username)" required />
     <input id="newpass" type="password" placeholder="รหัสผ่านใหม่" required />
     <button type="submit">ตั้งรหัสผ่านใหม่</button>
+    <div class="links">
+      <a href="/index.html">ย้อนกลับเข้าสู่ระบบ</a>
+    </div>
   </form>
 
   <script>
-    async function reset(e) {
+    async function resetPassword(e) {
       e.preventDefault();
-      const res = await fetch('/api/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: document.getElementById('username').value,
-          newPassword: document.getElementById('newpass').value
-        })
-      });
-
-      const data = await res.json();
-      alert(data.msg);
-      if (res.ok) location.href = '/';
+      const username = document.getElementById('user').value.trim();
+      const newPassword = document.getElementById('newpass').value;
+      if (!username || !newPassword) {
+        alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+        return;
+      }
+      try {
+        const res = await fetch('/api/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, newPassword })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert('เปลี่ยนรหัสผ่านเรียบร้อยแล้ว');
+          // พากลับหน้า login
+          window.location.href = '/index.html';
+        } else {
+          alert(data.msg || 'เกิดข้อผิดพลาด');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
+      }
     }
   </script>
 </body>

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -8,181 +7,74 @@
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Prompt', sans-serif;
-      background: #f4f4f4;
-      color: #222;
-    }
-
+    body { margin:0; font-family:'Prompt',sans-serif; background:#f4f4f4; color:#222; }
     header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background-color: #000;
-      color: #fff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 16px;
-      z-index: 1000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      position:fixed; top:0; left:0; right:0; height:60px;
+      background:#000; color:#fff;
+      display:flex; justify-content:space-between; align-items:center;
+      padding:0 16px; z-index:1000;
+      box-shadow:0 2px 8px rgba(0,0,0,0.15);
     }
-
     header h3 {
-      margin: 0;
-      font-size: 1.1rem;
+      margin:0; font-size:1.1rem;
+      cursor:pointer;             /* ทำให้ดูเหมือนกดได้ */
     }
-
     .points-box {
-      font-weight: 600;
-      font-size: 1rem;
-      display: flex;
-      gap: 16px;
-      align-items: center;
+      font-weight:600; font-size:1rem;
     }
-
-    .logout-btn {
-      padding: 6px 14px;
-      background: transparent;
-      border: 1px solid white;
-      border-radius: 999px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .logout-btn:hover {
-      background: white;
-      color: #000;
-    }
-
     .container {
-      padding: 100px 16px 40px;
-      max-width: 1200px;
-      margin: auto;
+      padding:100px 16px 40px; max-width:1200px; margin:auto;
     }
-
     h2.title {
-      text-align: center;
-      font-size: 1.6rem;
-      font-weight: 600;
-      margin-top: 10px;
-      position: relative;
-      color: #000;
+      text-align:center; font-size:1.6rem; font-weight:600; margin-top:10px; position:relative; color:#000;
     }
-
     h2.title::after {
-      content: "";
-      position: absolute;
-      width: 60px;
-      height: 3px;
-      background: #000;
-      bottom: -8px;
-      left: 50%;
-      transform: translateX(-50%);
+      content:""; position:absolute; width:60px; height:3px; background:#000;
+      bottom:-8px; left:50%; transform:translateX(-50%);
     }
-
-    .search-box {
-      margin: 30px auto;
-      text-align: center;
-    }
-
+    .search-box { margin:30px auto; text-align:center; }
     .search-box input {
-      padding: 10px 20px;
-      border: 1px solid #333;
-      border-radius: 999px;
-      width: 80%;
-      max-width: 320px;
-      font-size: 1rem;
+      padding:10px 20px; border:1px solid #333; border-radius:999px;
+      width:80%; max-width:320px; font-size:1rem;
     }
-
     .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 20px;
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:20px;
     }
-
     .reward-card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      text-align: center;
-      transition: transform 0.2s, box-shadow 0.3s;
-      border: 1px solid #ccc;
+      background:#fff; border-radius:8px; padding:16px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08); text-align:center;
+      transition:transform .2s, box-shadow .3s; border:1px solid #ccc;
     }
-
     .reward-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+      transform:translateY(-4px); box-shadow:0 6px 16px rgba(0,0,0,0.15);
     }
-
     .reward-card img {
-      width: 100%;
-      border-radius: 4px;
-      margin-bottom: 10px;
+      width:100%; border-radius:4px; margin-bottom:10px;
     }
-
-    .reward-card h3 {
-      margin: 10px 0 6px;
-      font-size: 1.05rem;
-    }
-
-    .reward-card p {
-      margin: 4px 0;
-      font-size: 0.95rem;
-      color: #444;
-    }
-
+    .reward-card h3 { margin:10px 0 6px; font-size:1.05rem; }
+    .reward-card p { margin:4px 0; font-size:.95rem; color:#444; }
     .reward-card button {
-      margin-top: 10px;
-      background: #000;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s;
+      margin-top:10px; background:#000; color:#fff; border:none;
+      padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer;
+      transition:background .2s;
     }
-
-    .reward-card button:hover {
-      background: #444;
-    }
-
-    .out-of-stock {
-      opacity: 0.5;
-    }
-
+    .reward-card button:hover { background:#444; }
+    .out-of-stock { opacity:.5; }
     .out-of-stock-msg {
-      color: #e53935;
-      font-weight: 600;
-      font-size: 0.9rem;
+      color:#e53935; font-weight:600; font-size:.9rem;
     }
-
-    @media screen and (max-width: 500px) {
-      .reward-card {
-        padding: 12px;
-      }
-      .reward-card h3 {
-        font-size: 1rem;
-      }
-      .reward-card p {
-        font-size: 0.85rem;
-      }
-      .reward-card button {
-        padding: 6px 12px;
-        font-size: 0.85rem;
-      }
+    @media screen and (max-width:500px) {
+      .reward-card { padding:12px; }
+      .reward-card h3 { font-size:1rem; }
+      .reward-card p { font-size:.85rem; }
+      .reward-card button { padding:6px 12px; font-size:.85rem; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h3>🚬 mepot</h3>
+    <!-- คลิกที่ h3 เพื่อไปหน้า Login -->
+    <h3 onclick="goLogin()">🚬 mepot</h3>
     <div class="points-box">
       <span id="userpoints">⭐ แต้มสะสม: -</span>
     </div>
@@ -191,91 +83,92 @@
   <div class="container">
     <h2 class="title">รายการสินค้า</h2>
     <div class="search-box">
-      <input type="text" id="search" placeholder="ค้นหาสินค้า..." oninput="filterRewards()">
+      <input type="text" id="search" placeholder="ค้นหาสินค้า..." oninput="filterRewards()" />
     </div>
     <div class="card-grid" id="rewards-list">กำลังโหลด...</div>
   </div>
 
   <script>
     let allRewards = [];
-
-    async function loadUser() {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/me', {
-        headers: { Authorization: 'Bearer ' + token }
-      });
-      const data = await res.json();
-      if (res.ok) {
-        document.getElementById('userpoints').innerText = `⭐ แต้มสะสม: ${data.points}`;
-      } else {
-        alert(data.msg);
-        location.href = '/';
-      }
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('กรุณาเข้าสู่ระบบ');
+      location.href = '/index.html';
     }
 
+    // ไปหน้า Login
+    function goLogin() {
+      localStorage.removeItem('token');  // ล้าง token เผื่อ
+      location.href = '/index.html';
+    }
+
+    // โหลดข้อมูลผู้ใช้
+    async function loadUser() {
+      const res = await fetch('/api/me', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      document.getElementById('userpoints').innerText = `⭐ แต้มสะสม: ${data.points}`;
+    }
+
+    // โหลดรางวัล
     async function loadRewards() {
       const res = await fetch('/api/rewards');
-      const data = await res.json();
-
-      allRewards = Object.entries(data).sort((a, b) => {
-        return a[1].quantity <= 0 && b[1].quantity > 0 ? 1 :
-               a[1].quantity > 0 && b[1].quantity <= 0 ? -1 : 0;
-      });
-
+      allRewards = await res.json();
       renderRewards(allRewards);
     }
 
-    function renderRewards(dataList) {
-      const listHTML = dataList.map(([name, reward]) => {
-        const isOut = reward.quantity <= 0;
-        return `
-          <div class="reward-card ${isOut ? 'out-of-stock' : ''}">
-            <img src="images/${reward.image}" alt="${name}" />
-            <h3>${name}</h3>
-            <p>ใช้ ${reward.points} แต้ม</p>
-            <p>เหลือ: ${reward.quantity} ชิ้น</p>
-            ${
-              isOut
-              ? `<p class="out-of-stock-msg">❌ สินค้าหมด</p>`
-              : `<button onclick="redeem('${name}')">แลกแต้ม</button>`
-            }
-          </div>
-        `;
-      }).join('');
+    // แสดงรางวัล จัดสินค้าคงเหลือขึ้นก่อน
+    function renderRewards(list) {
+      const available  = list.filter(r => r.quantity > 0);
+      const outOfStock = list.filter(r => r.quantity <= 0);
+      const sorted     = available.concat(outOfStock);
 
-      document.getElementById('rewards-list').innerHTML = listHTML;
+      document.getElementById('rewards-list').innerHTML =
+        sorted.map(r => {
+          const isOut = r.quantity <= 0;
+          return `
+            <div class="reward-card ${isOut ? 'out-of-stock' : ''}">
+              <img src="/images/${r.image}" alt="${r.name}" />
+              <h3>${r.name}</h3>
+              <p>ใช้ ${r.points} แต้ม</p>
+              <p>เหลือ: ${r.quantity} ชิ้น</p>
+              ${
+                isOut
+                ? `<p class="out-of-stock-msg">❌ สินค้าหมด</p>`
+                : `<button onclick="redeem('${r.name}')">แลกแต้ม</button>`
+              }
+            </div>`;
+        }).join('');
     }
 
+    // ค้นหา
     function filterRewards() {
-      const keyword = document.getElementById('search').value.toLowerCase();
-      const filtered = allRewards.filter(([name, _]) =>
-        name.toLowerCase().includes(keyword)
-      );
+      const kw = document.getElementById('search').value.toLowerCase();
+      const filtered = allRewards.filter(r => r.name.toLowerCase().includes(kw));
       renderRewards(filtered);
     }
 
+    // แลกรางวัล
     async function redeem(name) {
-      if (!confirm(`ยืนยันแลกรางวัล: ${name} ?`)) return;
-      const token = localStorage.getItem('token');
+      if (!confirm(`ยืนยันแลกรางวัล: ${name}?`)) return;
       const res = await fetch('/api/redeem', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token
         },
-        body: JSON.stringify({ rewardName: name })
+        body: JSON.stringify({ name })
       });
-
       const data = await res.json();
       alert(data.msg);
-      if (res.ok) location.reload();
+      if (res.ok) {
+        loadUser();
+        loadRewards();
+      }
     }
 
-    function logout() {
-      localStorage.removeItem('token');
-      location.href = '/';
-    }
-
+    // เริ่มต้น
     loadUser();
     loadRewards();
   </script>
